@@ -1,0 +1,198 @@
+:root {
+  --bg: #f4efe6;
+  --bg-2: #ebe3d5;
+  --ink: #2c2a26;
+  --ink-soft: #6d665b;
+  --accent: #8a6f4e;
+  --track: rgba(44, 42, 38, 0.12);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16181d;
+    --bg-2: #1e2128;
+    --ink: #e9e4da;
+    --ink-soft: #9a9488;
+    --accent: #c9a77c;
+    --track: rgba(233, 228, 218, 0.12);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+body {
+  background: radial-gradient(ellipse at 50% 40%, var(--bg-2), var(--bg) 70%) fixed;
+}
+
+main {
+  position: relative;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Screens: only the one matching data-state is shown */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0s linear 0.8s;
+}
+
+main[data-state="intro"] .intro,
+main[data-state="session"] .session,
+main[data-state="outro"] .outro {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.8s ease, visibility 0s;
+}
+
+.intro, .outro { gap: 4px; }
+.intro p, .outro p { max-width: 34ch; line-height: 1.55; color: var(--ink-soft); margin: 0 0 12px; }
+
+h1, h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  margin: 0 0 16px;
+}
+h1 { font-size: clamp(2.6rem, 10vw, 3.6rem); }
+h2 { font-size: clamp(2rem, 8vw, 2.8rem); }
+
+.lede {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  color: var(--ink) !important;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  min-height: 48px;
+  padding: 12px 32px;
+}
+button.primary {
+  margin-top: 20px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+button.quiet {
+  background: transparent;
+  color: var(--ink-soft);
+}
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.actions { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+.toggle input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+/* Timer */
+.timer {
+  position: relative;
+  width: min(52vw, 220px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.timer svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.timer circle { fill: none; stroke-width: 3; }
+.timer .track { stroke: var(--track); }
+.timer .ring {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-dasharray: 339.292;
+  stroke-dashoffset: 0;
+}
+.time {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 9vw, 2.6rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+.session .quiet {
+  position: absolute;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  font-size: 0.9rem;
+}
+
+/* Floating questions */
+.field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.question {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: max-content;
+  max-width: min(78vw, 360px);
+  transform: translate(-50%, -50%);
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 5.4vw, 1.6rem);
+  line-height: 1.35;
+  text-align: center;
+  color: var(--ink);
+  text-wrap: balance;
+  opacity: 0;
+  animation:
+    fade var(--life) ease-in-out forwards,
+    drift var(--life) ease-in-out forwards;
+}
+
+@keyframes fade {
+  0%   { opacity: 0; filter: blur(4px); }
+  18%  { opacity: 1; filter: blur(0); }
+  78%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 0; filter: blur(3px); }
+}
+
+@keyframes drift {
+  from { transform: translate(-50%, -50%) translate(0, 0); }
+  to   { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question { animation: fade var(--life) linear forwards; }
+  .screen { transition: none; }
+}
