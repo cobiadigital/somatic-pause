@@ -1,0 +1,11 @@
+{
+  // Static-assets Worker: everything in ./public is served from Cloudflare's edge.
+  // Workers Builds runs `npx wrangler deploy` on each push; no build step needed.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "somatic-pause",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "single-page-application"
+  }
+}
