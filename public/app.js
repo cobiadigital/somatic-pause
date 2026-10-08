@@ -25,6 +25,7 @@
   let band = 0;
   let audio = null;
   let wakeLock = null;
+  let questions = null;
 
   // ---------- storage (best effort; the app works without it) ----------
 
@@ -59,7 +60,7 @@
   }
 
   function buildSchedule() {
-    const Q = window.QUESTIONS;
+    const Q = questions;
     const slots = Math.floor((DURATION_MS - LIFE_MS - FIRST_AT_MS) / EVERY_MS) + 1;
     const recent = store.get(RECENT_KEY, []);
 
@@ -159,12 +160,6 @@
     app.dataset.state = "outro";
   }
 
-  function endEarly() {
-    stopLoop();
-    field.replaceChildren();
-    app.dataset.state = "intro";
-  }
-
   // ---------- chime ----------
 
   function unlockAudio() {
@@ -217,9 +212,14 @@
   sound.checked = store.get(SOUND_KEY, true);
   sound.addEventListener("change", () => store.set(SOUND_KEY, sound.checked));
 
+  // Begin stays disabled until the question bank has loaded.
+  $("start").disabled = true;
+  fetch("/questions.json")
+    .then((r) => r.json())
+    .then((q) => { questions = q; $("start").disabled = false; });
+
   $("start").addEventListener("click", start);
   $("again").addEventListener("click", start);
-  $("stop").addEventListener("click", endEarly);
   $("done").addEventListener("click", () => { app.dataset.state = "intro"; });
 
   if ("serviceWorker" in navigator) {

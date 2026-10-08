@@ -1,13 +1,13 @@
 // Offline support. Bump VERSION whenever files in /public change so phones
 // pick up the new copy on their next visit.
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = `pause-${VERSION}`;
 const ASSETS = [
   "/",
   "/index.html",
   "/styles.css",
   "/app.js",
-  "/questions.js",
+  "/questions.json",
   "/manifest.webmanifest",
   "/icons/icon.svg",
   "/icons/icon-192.png",

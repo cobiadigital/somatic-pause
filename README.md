@@ -16,7 +16,7 @@ Questions you saw in the last couple of sessions are deprioritized so each pause
 
 ## Editing the questions
 
-All questions live in [`public/questions.js`](public/questions.js), grouped into `ground`, `explore` and `allow`. Add, remove or reword lines there; you can do this from the GitHub mobile app. After editing, bump `VERSION` in [`public/sw.js`](public/sw.js) (e.g. `"v1"` to `"v2"`) so installed copies update.
+All questions live in [`public/questions.json`](public/questions.json), grouped into `ground`, `explore` and `allow`. Each line is one question: `{ "text": "..." }`, with an optional `"from"` noting its lineage (not shown in the app). Keep the commas between lines and no comma after the last one in a group. You can edit it from the GitHub mobile app; installed copies pick up changes the next time they open online.
 
 ## Deploying (Cloudflare Workers Builds)
 
@@ -35,7 +35,7 @@ No secrets or environment variables are needed.
 | `wrangler.jsonc` | Worker config, serves `./public` |
 | `public/index.html` | Intro, session and closing screens |
 | `public/app.js` | Timer, question scheduling, chime, wake lock |
-| `public/questions.js` | The question bank |
+| `public/questions.json` | The question bank |
 | `public/styles.css` | Layout, light/dark themes, floating animation |
 | `public/sw.js` | Offline cache |
 | `public/manifest.webmanifest`, `public/icons/` | PWA install metadata |

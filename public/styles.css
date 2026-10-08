@@ -148,12 +148,6 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   color: var(--ink-soft);
 }
 
-.session .quiet {
-  position: absolute;
-  bottom: max(16px, env(safe-area-inset-bottom));
-  font-size: 0.9rem;
-}
-
 /* Floating questions */
 .field {
   position: absolute;
