@@ -8,9 +8,9 @@ The 90 seconds comes from Jill Bolte Taylor's observation that the physiology of
 
 A new question appears every 6 seconds by default (about 14 per pause):
 
-1. **Ground** (1): arrive in the body, e.g. "Where do my feet meet the floor?"
+1. **Ground** (1): arrive in the body, e.g. "Notice where your feet meet the floor."
 2. **Explore** (most of them): curious questions about the sensation's location, texture, movement
-3. **Allow** (2): making room for what's here, e.g. "Can I meet this with kindness?"
+3. **Allow** (2): making room for what's here, e.g. "Meet the sensation with kindness."
 
 Questions you saw in the last couple of sessions are deprioritized so each pause feels fresh.
 
