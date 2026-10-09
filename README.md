@@ -1,6 +1,6 @@
 # Somatic Pause
 
-A 90-second mind-body check-in. Press **Begin**, notice a sensation, and let gentle questions drift across the screen while a ring counts down. Installable as a PWA and works offline.
+A 90-second mind-body check-in. The timer starts as soon as the page opens: notice a sensation and let gentle questions drift across the screen while a ring counts down near the bottom. Installable as a PWA and works offline.
 
 The 90 seconds comes from Jill Bolte Taylor's observation that the physiology of an emotion moves through the body in about a minute and a half. The questions draw on Acceptance and Commitment Therapy, Eugene Gendlin's Focusing, Gabor Maté's Compassionate Inquiry, and Rhonda Magee's work on mindfulness and racial justice.
 
@@ -33,8 +33,8 @@ No secrets or environment variables are needed.
 | Path | Purpose |
 | --- | --- |
 | `wrangler.jsonc` | Worker config, serves `./public` |
-| `public/index.html` | Intro, session and closing screens |
-| `public/app.js` | Timer, question scheduling, chime, wake lock |
+| `public/index.html` | Session and closing screens |
+| `public/app.js` | Timer, question scheduling, wake lock |
 | `public/questions.json` | The question bank |
 | `public/styles.css` | Layout, light/dark themes, floating animation |
 | `public/sw.js` | Offline cache |

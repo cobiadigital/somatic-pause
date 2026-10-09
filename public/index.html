@@ -16,19 +16,7 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <main id="app" data-state="intro">
-
-    <!-- Intro -->
-    <section class="screen intro" aria-labelledby="intro-title">
-      <h1 id="intro-title">Pause</h1>
-      <p class="lede">An emotion moves through the body in about ninety seconds.</p>
-      <p>Notice a sensation that's asking for attention. For the next minute and a half, just be curious about it. Questions will drift by. There are no right answers.</p>
-      <button class="primary" id="start" type="button">Begin</button>
-      <label class="toggle">
-        <input type="checkbox" id="sound" checked>
-        <span>Soft chime at the end</span>
-      </label>
-    </section>
+  <main id="app" data-state="session">
 
     <!-- Session -->
     <section class="screen session" aria-label="Pause in progress">
@@ -47,10 +35,7 @@
       <h2 id="outro-title">Ninety seconds.</h2>
       <p class="lede">Notice what's here now.</p>
       <p>Has anything shifted, even a little? Nothing needs to have.</p>
-      <div class="actions">
-        <button class="primary" id="again" type="button">Pause again</button>
-        <button class="quiet" id="done" type="button">Done</button>
-      </div>
+      <button class="primary" id="again" type="button">Pause again</button>
     </section>
 
   </main>

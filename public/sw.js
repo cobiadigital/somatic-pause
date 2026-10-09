@@ -1,6 +1,6 @@
 // Offline support. Bump VERSION whenever files in /public change so phones
 // pick up the new copy on their next visit.
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE = `pause-${VERSION}`;
 const ASSETS = [
   "/",

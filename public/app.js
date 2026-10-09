@@ -2,12 +2,11 @@
   "use strict";
 
   const DURATION_MS = 90_000;
-  const FIRST_AT_MS = 1_500;  // first question appears shortly after Begin
+  const FIRST_AT_MS = 1_500;  // first question appears shortly after load
   const EVERY_MS = 9_000;     // a new question every 9s
   const LIFE_MS = 11_000;     // each one lingers ~11s, so they overlap briefly
   const ALLOW_COUNT = 2;      // closing "allow" questions at the end
   const RECENT_KEY = "pause.recent";
-  const SOUND_KEY = "pause.sound";
   const RING_LENGTH = 2 * Math.PI * 54;
 
   const $ = (id) => document.getElementById(id);
@@ -15,7 +14,6 @@
   const field = $("field");
   const ring = $("ring");
   const time = $("time");
-  const sound = $("sound");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   let schedule = [];
@@ -23,7 +21,6 @@
   let startedAt = 0;
   let frame = 0;
   let band = 0;
-  let audio = null;
   let wakeLock = null;
   let questions = null;
 
@@ -83,28 +80,24 @@
 
   function float(text, lifeMs) {
     const el = document.createElement("p");
-    el.className = "question";
+    const align = ["left", "center", "right"][Math.floor(Math.random() * 3)];
+    el.className = `question ${align}`;
     el.textContent = text;
 
-    // Alternate above and below the timer so overlapping questions never collide.
+    // All questions sit above the timer. Alternate between the upper and lower
+    // half of that space so two overlapping questions never collide.
     band = 1 - band;
-    const y = band ? rand(13, 27) : rand(70, 82);
-    const x = rand(40, 60);
+    const y = band ? rand(12, 34) : rand(60, 84);
     const still = reducedMotion.matches;
 
     el.style.setProperty("--y", `${y}%`);
-    el.style.setProperty("--dx", still ? "0px" : `${rand(-24, 24).toFixed(1)}px`);
-    el.style.setProperty("--dy", still ? "0px" : `${rand(-18, 18).toFixed(1)}px`);
+    // Left/right questions sit a little in from the edge (16px gutter + drift room).
+    el.style.setProperty("--inset", `${Math.round(40 + rand(0, 0.08) * field.clientWidth)}px`);
+    el.style.setProperty("--dx", still ? "0px" : `${rand(-20, 20).toFixed(1)}px`);
+    el.style.setProperty("--dy", still ? "0px" : `${rand(-14, 14).toFixed(1)}px`);
     el.style.setProperty("--life", `${lifeMs}ms`);
 
     field.appendChild(el);
-
-    // Keep long questions (plus their drift) inside a 16px gutter.
-    const room = field.clientWidth;
-    const half = el.offsetWidth / 2 + 16 + 24;
-    const px = Math.min(Math.max((x / 100) * room, half), room - half);
-    el.style.setProperty("--x", `${px}px`);
-
     setTimeout(() => el.remove(), lifeMs + 100);
   }
 
@@ -138,7 +131,6 @@
   }
 
   function start() {
-    unlockAudio();
     requestWakeLock();
     field.replaceChildren();
     schedule = buildSchedule();
@@ -155,37 +147,7 @@
 
   function finish() {
     stopLoop();
-    if (sound.checked) chime();
-    if (navigator.vibrate) navigator.vibrate([60, 120, 60]);
     app.dataset.state = "outro";
-  }
-
-  // ---------- chime ----------
-
-  function unlockAudio() {
-    if (!sound.checked) return;
-    try {
-      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
-      if (audio.state === "suspended") audio.resume();
-    } catch { audio = null; }
-  }
-
-  // A soft, bowl-like tone: two sine partials with a slow decay.
-  function chime() {
-    if (!audio) return;
-    const now = audio.currentTime;
-    [[392, 0.22], [588, 0.1], [784, 0.05]].forEach(([freq, level]) => {
-      const osc = audio.createOscillator();
-      const gain = audio.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(level, now + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 4);
-      osc.connect(gain).connect(audio.destination);
-      osc.start(now);
-      osc.stop(now + 4.1);
-    });
   }
 
   // ---------- keep the screen awake during a pause ----------
@@ -209,18 +171,12 @@
 
   // ---------- wiring ----------
 
-  sound.checked = store.get(SOUND_KEY, true);
-  sound.addEventListener("change", () => store.set(SOUND_KEY, sound.checked));
-
-  // Begin stays disabled until the question bank has loaded.
-  $("start").disabled = true;
+  // The pause starts as soon as the question bank has loaded.
   fetch("/questions.json")
     .then((r) => r.json())
-    .then((q) => { questions = q; $("start").disabled = false; });
+    .then((q) => { questions = q; start(); });
 
-  $("start").addEventListener("click", start);
   $("again").addEventListener("click", start);
-  $("done").addEventListener("click", () => { app.dataset.state = "intro"; });
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
