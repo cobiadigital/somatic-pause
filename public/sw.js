@@ -1,6 +1,6 @@
 // Offline support. Bump VERSION whenever files in /public change so phones
 // pick up the new copy on their next visit.
-const VERSION = "v5";
+const VERSION = "v6";
 const CACHE = `pause-${VERSION}`;
 const ASSETS = [
   "/",
@@ -30,7 +30,10 @@ self.addEventListener("activate", (event) => {
 // /api/config is cached the same way, so the last questions work offline.
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-  if (request.method !== "GET" || new URL(request.url).origin !== location.origin) return;
+  const url = new URL(request.url);
+  if (request.method !== "GET" || url.origin !== location.origin) return;
+  // Never cache the admin page or its API; they should always be live.
+  if (url.pathname.startsWith("/admin") || url.pathname.startsWith("/api/admin")) return;
 
   event.respondWith(
     fetch(request)

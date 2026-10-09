@@ -30,7 +30,15 @@ Neither of these needs a commit. Changes apply the next time the page loads (KV 
 
 Questions live in the KV namespace `somatic-pause-questions`, key `questions`. The first time the app runs, that key is filled from [`src/questions.json`](src/questions.json), the defaults.
 
-To edit: **Storage & Databases** → **Workers KV** → `somatic-pause-questions` → **KV Pairs** → `questions` → edit.
+#### Admin page (easiest)
+
+Go to **`/admin`** on your site to add, edit, delete or reset questions from your phone.
+
+One-time setup: **Workers & Pages** → `somatic-pause` → **Settings** → **Variables and Secrets** → **Add** → Type: **Secret**, Name: `ADMIN_PASSWORD`, Value: a password you choose → **Deploy**. Sign in once per browser; it's remembered until you tap **Sign out**. To change the password, edit the secret in the same place.
+
+#### Editing KV directly
+
+**Storage & Databases** → **Workers KV** → `somatic-pause-questions` → **KV Pairs** → `questions` → edit.
 
 - Groups are `ground`, `explore` and `allow`.
 - Each item can be `{"text": "..."}` (optionally with `"from"`, which isn't shown) or just `"..."`.
@@ -42,17 +50,18 @@ Edits to `src/questions.json` only change the defaults. They don't overwrite que
 
 ## Deploying (Cloudflare Workers Builds)
 
-No build step. Workers Builds runs `npx wrangler deploy` on each push; pushes to `main` go to production and other branches get preview URLs if non-production builds are enabled. The KV namespace ID is in `wrangler.jsonc`. No secrets are needed.
+No build step. Workers Builds runs `npx wrangler deploy` on each push; pushes to `main` go to production and other branches get preview URLs if non-production builds are enabled. The KV namespace ID is in `wrangler.jsonc`. The only secret is the optional `ADMIN_PASSWORD` for the admin page.
 
 ## Files
 
 | Path | Purpose |
 | --- | --- |
 | `wrangler.jsonc` | Worker config: static assets, KV binding, `keep_vars` |
-| `src/index.js` | Worker: `/api/config` returns question timing and questions from KV |
+| `src/index.js` | Worker: `/api/config` (timing + questions) and the password-protected `/api/admin/questions` |
 | `src/questions.json` | Default questions, used to seed KV |
 | `public/index.html` | Session and closing screens |
 | `public/app.js` | Timer, question scheduling, wake lock |
 | `public/styles.css` | Layout, light/dark themes, floating animation |
-| `public/sw.js` | Offline cache |
+| `public/admin.html`, `admin.js`, `admin.css` | Question admin page at `/admin` |
+| `public/sw.js` | Offline cache (skips the admin page) |
 | `public/manifest.webmanifest`, `public/icons/` | PWA install metadata |
