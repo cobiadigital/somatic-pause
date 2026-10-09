@@ -1,13 +1,12 @@
 // Offline support. Bump VERSION whenever files in /public change so phones
 // pick up the new copy on their next visit.
-const VERSION = "v3";
+const VERSION = "v4";
 const CACHE = `pause-${VERSION}`;
 const ASSETS = [
   "/",
   "/index.html",
   "/styles.css",
   "/app.js",
-  "/questions.json",
   "/manifest.webmanifest",
   "/icons/icon.svg",
   "/icons/icon-192.png",
@@ -28,6 +27,7 @@ self.addEventListener("activate", (event) => {
 });
 
 // Network first (so updates arrive), falling back to cache when offline.
+// /api/config is cached the same way, so the last questions work offline.
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET" || new URL(request.url).origin !== location.origin) return;

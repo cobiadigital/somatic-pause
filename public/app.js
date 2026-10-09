@@ -3,9 +3,7 @@
 
   const DURATION_MS = 90_000;
   const FIRST_AT_MS = 1_500;  // first question appears shortly after load
-  const EVERY_MS = 9_000;     // a new question every 9s
-  const LIFE_MS = 11_000;     // each one lingers ~11s, so they overlap briefly
-  const ALLOW_COUNT = 2;      // closing "allow" questions at the end
+  const CROSSFADE_MS = 1_000; // the next question starts fading in as the last fades out
   const RECENT_KEY = "pause.recent";
   const RING_LENGTH = 2 * Math.PI * 54;
 
@@ -23,6 +21,8 @@
   let band = 0;
   let wakeLock = null;
   let questions = null;
+  let everyMs = 6_000;       // how long each question shows; set by the Worker (QUESTION_SECONDS)
+  let lifeMs = everyMs + CROSSFADE_MS;
 
   // ---------- storage (best effort; the app works without it) ----------
 
@@ -58,20 +58,22 @@
 
   function buildSchedule() {
     const Q = questions;
-    const slots = Math.floor((DURATION_MS - LIFE_MS - FIRST_AT_MS) / EVERY_MS) + 1;
+    const slots = Math.floor((DURATION_MS - lifeMs - FIRST_AT_MS) / everyMs) + 1;
     const recent = store.get(RECENT_KEY, []);
+    // One grounding question, then exploring, ending with up to two "allow" questions.
+    const allowCount = slots >= 4 ? 2 : slots >= 2 ? 1 : 0;
 
     const chosen = [
       ...pick(Q.ground, 1, recent),
-      ...pick(Q.explore, slots - 1 - ALLOW_COUNT, recent),
-      ...pick(Q.allow, ALLOW_COUNT, recent),
+      ...pick(Q.explore, Math.max(0, slots - 1 - allowCount), recent),
+      ...pick(Q.allow, allowCount, recent),
     ];
 
     // Remember about two sessions' worth so the next pause feels new.
     const texts = chosen.map((q) => q.text);
     store.set(RECENT_KEY, texts.concat(recent.filter((t) => !texts.includes(t))).slice(0, slots * 2));
 
-    return chosen.map((q, i) => ({ text: q.text, at: FIRST_AT_MS + i * EVERY_MS }));
+    return chosen.map((q, i) => ({ text: q.text, at: FIRST_AT_MS + i * everyMs }));
   }
 
   // ---------- floating ----------
@@ -122,7 +124,7 @@
       due = schedule[nextIndex++];
     }
     if (due) {
-      const lifeLeft = due.at + LIFE_MS - elapsed;
+      const lifeLeft = due.at + lifeMs - elapsed;
       if (lifeLeft > 2_000) float(due.text, lifeLeft);
     }
 
@@ -172,9 +174,15 @@
   // ---------- wiring ----------
 
   // The pause starts as soon as the question bank has loaded.
-  fetch("/questions.json")
+  // Questions and timing come from the Worker (KV + dashboard variable).
+  fetch("/api/config")
     .then((r) => r.json())
-    .then((q) => { questions = q; start(); });
+    .then((config) => {
+      questions = config.questions;
+      everyMs = config.questionSeconds * 1000;
+      lifeMs = everyMs + CROSSFADE_MS;
+      start();
+    });
 
   $("again").addEventListener("click", start);
 
