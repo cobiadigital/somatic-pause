@@ -93,10 +93,13 @@
     const still = reducedMotion.matches;
 
     el.style.setProperty("--y", `${y}%`);
-    // Left/right questions sit a little in from the edge (16px gutter + drift room).
-    el.style.setProperty("--inset", `${Math.round(40 + rand(0, 0.08) * field.clientWidth)}px`);
-    el.style.setProperty("--dx", still ? "0px" : `${rand(-20, 20).toFixed(1)}px`);
-    el.style.setProperty("--dy", still ? "0px" : `${rand(-14, 14).toFixed(1)}px`);
+    // Left/right questions sit a little in from the edge (14px gutter + 30px drift room).
+    el.style.setProperty("--inset", `${Math.round(44 + rand(0, 0.08) * field.clientWidth)}px`);
+    // Drift a set distance in a random direction, so every question visibly moves.
+    const angle = rand(0, 2 * Math.PI);
+    const distance = still ? 0 : rand(22, 30);
+    el.style.setProperty("--dx", `${(Math.cos(angle) * distance).toFixed(1)}px`);
+    el.style.setProperty("--dy", `${(Math.sin(angle) * distance * 0.7).toFixed(1)}px`);
     el.style.setProperty("--life", `${lifeMs}ms`);
 
     field.appendChild(el);

@@ -152,7 +152,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .question {
   position: absolute;
   top: var(--y);
-  max-width: min(76vw, 360px);
+  max-width: min(72vw, 360px);
   margin: 0;
   font-family: var(--serif);
   font-size: clamp(1.25rem, 5.4vw, 1.6rem);
@@ -163,10 +163,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   transform: translate(var(--tx), -50%);
   animation:
     fade var(--life) ease-in-out forwards,
-    drift var(--life) ease-in-out forwards;
+    /* Strong ease-out: moving most while it fades in, nearly still as it fades out. */
+    drift var(--life) cubic-bezier(0.05, 0.75, 0.2, 1) forwards;
 }
-.question.left   { left: var(--inset); text-align: left; --tx: 0; max-width: min(calc(100% - var(--inset) - 40px), 360px); }
-.question.right  { right: var(--inset); text-align: right; --tx: 0; max-width: min(calc(100% - var(--inset) - 40px), 360px); }
+.question.left   { left: var(--inset); text-align: left; --tx: 0; max-width: min(calc(100% - var(--inset) - 44px), 360px); }
+.question.right  { right: var(--inset); text-align: right; --tx: 0; max-width: min(calc(100% - var(--inset) - 44px), 360px); }
 .question.center { left: 50%; width: max-content; text-align: center; --tx: -50%; }
 
 @keyframes fade {
